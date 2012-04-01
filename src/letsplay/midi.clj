@@ -41,13 +41,13 @@
         note (:note event)]
     (match [chan cmd]
       [14 _] nil ;; filter out active sense
-      [_ 144] (dosync
+      [_ 144] (dosync ;; (next-rotate) and (add-notes) must be sync'ed
                (let [notes (map #(+ % note) [(next-rotate) 0 7])]
                  (add-notes note notes) ;; mapping note => notes
                  (doall
                   (map #(midi-note-on synth-out % (:vel event)) notes))))
-      [_ 128] (doall
-               (let [notes (@notes-playing note)]
+      [_ 128] (let [notes (@notes-playing note)]
+                (doall
                  (map #(midi-note-off synth-out %) notes))))))
 
 ;; Set the expander function to handle incoming midi

@@ -27,8 +27,9 @@
     (ref-set rotate (concat (rest @rotate) (list note)))
     note))
 
+;; Init a vector of 128 empty lists
 (def notes-playing
-  (ref (vec (repeat 128 []))))
+  (ref (vec (repeat 128 '()))))
 
 (defn add-notes [note notes]
   (ref-set notes-playing
@@ -46,7 +47,8 @@
                  (doall
                   (map #(midi-note-on synth-out % (:vel event)) notes))))
       [_ 128] (doall
-               (map #(midi-note-off synth-out %) (@notes-playing note))))))
+               (let [notes (@notes-playing note)]
+                 (map #(midi-note-off synth-out %) notes))))))
 
 ;; Set the expander function to handle incoming midi
 ;; (midi-handle-events kb #'expander)

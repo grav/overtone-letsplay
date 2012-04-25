@@ -1,5 +1,5 @@
 (ns betafunk.jazz
-  (:use overtone.live))
+  (:use [overtone.live] [overtone.inst.drum]))
 
 ;; a bit of pattern matching
 (use '[clojure.core.match :only [match]])
@@ -46,3 +46,48 @@
 ;; ride cymbal
 (def ride (sample (freesound-path 436)))
 (ride)
+
+(def metro (metronome 160))
+
+(defn offnote? [time]
+  (= (mod time 1 ) 0.5))
+
+(defn groove [time]
+  (if (offnote? time)
+    (+ time 0.2)
+    time))
+
+(defn my-play [tick bar]
+  (doseq [hit (deref bar)]
+    (let [time (groove (first hit))
+          instr (second hit)]
+      (at (metro (+ time tick))
+        (instr)))))
+
+(defn loop-play [m bar len]
+  (let [beat (m)]
+    (my-play beat bar)
+    (apply-at (m (+ len beat)) #'loop-play [m bar len])))
+
+(def jazzdrums
+  [[0 ride]
+   [1 ride]
+   [1.5 ride]
+   [2 ride]
+   [ 3 ride]
+   [ 3.5 ride]
+   [1 c-hat]
+   [3 c-hat]
+   [3.5 snare]
+   ])
+
+;; re-evaluate to improvise some ride!
+(def jazzdrums
+  (filter #(not (nil? %)) (concat
+           (map (fn [t] (when (< (rand) 0.3) [t ride])) (range 0.5 4))
+           (map (fn [t] [t ride]) (range 0 4))
+           (map (fn [t] [t c-hat]) (range 1 4 2)))))
+
+;; (loop-play metro #'jazzdrums 4)
+
+;; (stop)

@@ -1,4 +1,4 @@
-(ns letsplay
+(ns betafunk.letsplay
   (:use overtone.live))
 
 (definst beep [note 60]

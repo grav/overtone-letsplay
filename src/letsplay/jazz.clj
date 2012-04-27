@@ -1,9 +1,16 @@
 (ns betafunk.jazz
-  (:use [overtone.live] [overtone.inst.drum]))
+  (:use [overtone.live] [overtone.inst.drum] [overtone.inst.synth]))
 
 ;; a bit of pattern matching
 (use '[clojure.core.match :only [match]])
 
+(definst beep [note 60]
+  (let
+      [src (sin-osc (midicps note))
+       env (env-gen (perc 0.01 0.9) :action FREE)]
+    (* src env)))
+
+(beep 45)
 ;; Specify input device
 ;; No arg will list midi devices in pop-up and
 ;; allow you to select one
@@ -57,37 +64,44 @@
     (+ time 0.2)
     time))
 
-(defn my-play [tick bar]
+(defn my-play [bar]
   (doseq [hit (deref bar)]
     (let [time (groove (first hit))
           instr (second hit)]
-      (at (metro (+ time tick))
+      (at (metro (+ time (metro)))
         (instr)))))
 
-(defn loop-play [m bar len]
-  (let [beat (m)]
-    (my-play beat bar)
-    (apply-at (m (+ len beat)) #'loop-play [m bar len])))
 
-(def jazzdrums
-  [[0 ride]
-   [1 ride]
-   [1.5 ride]
-   [2 ride]
-   [ 3 ride]
-   [ 3.5 ride]
-   [1 c-hat]
-   [3 c-hat]
-   [3.5 snare]
-   ])
+(defn loop-play [bar len]
+  (my-play bar)
+  (apply-at (metro (+ len (metro))) #'loop-play [bar len]))
+
 
 ;; re-evaluate to improvise some ride!
-(def jazzdrums
-  (filter #(not (nil? %)) (concat
-           (map (fn [t] (when (< (rand) 0.3) [t ride])) (range 0.5 4))
-           (map (fn [t] [t ride]) (range 0 4))
-           (map (fn [t] [t c-hat]) (range 1 4 2)))))
 
-;; (loop-play metro #'jazzdrums 4)
+(def length 8)
+
+(def jazzdrums
+  (filter #(not (nil? %))
+          (concat (map (fn [t] (when (< (rand) 0.3) [t ride])) (range 0.5 length))
+                  (map (fn [t] [t ride]) (range 0 length))
+                  (map (fn [t] [t c-hat]) (range 1 length 2))
+                  (map (fn [t] (when (< (rand) 0.1) [t snare])) (range 0.5 length))
+                  )))
+
+;; (loop-play #'jazzdrums length)
+
+(defn jazzbass [n]
+  (let [beat (metro)
+        note (if (zero? (mod beat 2))
+               (dec n)
+               (max 40
+                    (min 65
+                         (+ n (rand-nth '(-7 -6 -5 5 6 7))))))]
+    (beep note)
+    (apply-at (metro (+ (metro) 1)) #'jazzbass [note])))
+
+
+;; (jazzbass 45)
 
 ;; (stop)

@@ -54,6 +54,8 @@
 (def ride (sample (freesound-path 436)))
 (ride)
 
+(def snap (sample (freesound-path 87731)))
+
 (def metro (metronome 160))
 
 (defn offnote? [time]
@@ -85,12 +87,12 @@
   (filter #(not (nil? %))
           (concat (map (fn [t] (when (< (rand) 0.3) [t ride])) (range 0.5 length))
                   (map (fn [t] [t ride]) (range 0 length))
-                  (map (fn [t] [t c-hat]) (range 1 length 2))
+                  (map (fn [t] [(- t 0.02) snap]) (range 1 length 2))
                   (map (fn [t] (when (< (rand) 0.1) [t snare])) (range 0.5 length))
                   )))
 
 ;; (loop-play #'jazzdrums length)
-
+(stop)
 (defn jazzbass [n]
   (let [beat (metro)
         note (if (zero? (mod beat 2))

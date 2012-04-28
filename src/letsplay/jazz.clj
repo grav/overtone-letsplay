@@ -66,18 +66,18 @@
     (+ time 0.2)
     time))
 
-(defn my-play [bar]
+(defn my-play [m bar-beat bar]
   (doseq [hit (deref bar)]
-    (let [time (groove (first hit))
+    (let [hit-time (groove (first hit))
           instr (second hit)]
-      (at (metro (+ time (metro)))
+      (at (m (+ bar-beat hit-time))
         (instr)))))
 
 
-(defn loop-play [bar len]
-  (my-play bar)
-  (apply-at (metro (+ len (metro))) #'loop-play [bar len]))
-
+(defn loop-play [m bar len]
+  (let [beat (m)]
+    (my-play m beat bar)
+    (apply-at (m (+ len beat)) #'loop-play [m bar len])))
 
 ;; re-evaluate to improvise some ride!
 
@@ -85,25 +85,29 @@
 
 (def jazzdrums
   (filter #(not (nil? %))
-          (concat (map (fn [t] (when (< (rand) 0.3) [t ride])) (range 0.5 length))
+          (concat (map #(when (< (rand) 0.3) [% ride]) (range 0.5 length))
                   (map (fn [t] [t ride]) (range 0 length))
                   (map (fn [t] [(- t 0.02) snap]) (range 1 length 2))
-                  (map (fn [t] (when (< (rand) 0.1) [t snare])) (range 0.5 length))
+                  (map #(when (< (rand) 0.1) [% snare]) (range 0.5 length))
                   )))
 
-;; (loop-play #'jazzdrums length)
-(stop)
-(defn jazzbass [n]
-  (let [beat (metro)
-        note (if (zero? (mod beat 2))
+
+
+(defn jazzbass [m n]
+  (let [beat (m)
+        tick (m beat)
+        note (if (zero? (mod tick 2))
                (dec n)
                (max 40
                     (min 65
                          (+ n (rand-nth '(-7 -6 -5 5 6 7))))))]
-    (beep note)
-    (apply-at (metro (+ (metro) 1)) #'jazzbass [note])))
+    (at tick
+      (+ (beep note) (bass (midi->hz note))))
+    (apply-at (m (+ beat 1)) #'jazzbass [m note])))
 
 
-;; (jazzbass 45)
+;; (loop-play metro #'jazzdrums length)
+
+;; (jazzbass metro 45)
 
 ;; (stop)

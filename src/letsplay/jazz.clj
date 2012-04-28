@@ -66,7 +66,7 @@
     (+ time 0.2)
     time))
 
-(defn my-play [m bar-beat bar]
+(defn play-bar [m bar-beat bar]
   (doseq [hit (deref bar)]
     (let [hit-time (groove (first hit))
           instr (second hit)]
@@ -76,7 +76,7 @@
 
 (defn loop-play [m bar len]
   (let [beat (m)]
-    (my-play m beat bar)
+    (play-bar m beat bar)
     (apply-at (m (+ len beat)) #'loop-play [m bar len])))
 
 ;; re-evaluate to improvise some ride!

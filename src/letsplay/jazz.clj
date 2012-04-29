@@ -27,6 +27,7 @@
     (ref-set rotate (concat (rest @rotate) (list note)))
     note))
 
+
 ;; Init a vector of 128 empty lists
 (def notes-playing
   (ref (vec (repeat 128 '()))))
@@ -54,6 +55,8 @@
 (def ride (sample (freesound-path 436)))
 (ride)
 
+(def cymbal (sample (freesound-path 13254)))
+
 (def snap (sample (freesound-path 87731)))
 
 (def metro (metronome 160))
@@ -67,7 +70,7 @@
     time))
 
 (defn play-bar [m bar-beat bar]
-  (doseq [hit (deref bar)]
+  (doseq [hit ((deref bar))]
     (let [hit-time (groove (first hit))
           instr (second hit)]
       (at (m (+ bar-beat hit-time))
@@ -81,28 +84,34 @@
 
 ;; re-evaluate to improvise some ride!
 
-(def length 8)
+(def length 4)
 
-(def jazzdrums
+(defn jazzdrums
+  []
   (filter #(not (nil? %))
           (concat (map #(when (< (rand) 0.3) [% ride]) (range 0.5 length))
                   (map (fn [t] [t ride]) (range 0 length))
                   (map (fn [t] [(- t 0.02) snap]) (range 1 length 2))
                   (map #(when (< (rand) 0.1) [% snare]) (range 0.5 length))
+
+                  (when (< (rand) 0.3)
+                    (let [t (+ 0.5 (rand-int length))]
+                      (list [t kick] [t cymbal])))
                   )))
-
-
 
 (defn jazzbass [m n]
   (let [beat (m)
         tick (m beat)
-        note (if (zero? (mod tick 2))
+        note (if (not (zero? (mod beat 2)))
                (dec n)
                (max 40
                     (min 65
                          (+ n (rand-nth '(-7 -6 -5 5 6 7))))))]
     (at tick
       (+ (beep note) (bass (midi->hz note))))
+    (when (> 0.1 (rand))
+      (at (m (+ beat (groove 0.5)) )
+         (+ (beep note) (bass (midi->hz note)))))
     (apply-at (m (+ beat 1)) #'jazzbass [m note])))
 
 

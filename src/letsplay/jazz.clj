@@ -4,13 +4,13 @@
 ;; a bit of pattern matching
 (use '[clojure.core.match :only [match]])
 
+;; just a simple example of a synth
 (definst beep [note 60]
   (let
       [src (sin-osc (midicps note))
        env (env-gen (perc 0.01 0.9) :action FREE)]
     (* src env)))
 
-(beep 45)
 ;; Specify input device
 ;; No arg will list midi devices in pop-up and
 ;; allow you to select one
@@ -36,6 +36,7 @@
   (ref-set notes-playing
            (assoc @notes-playing note notes)))
 
+;; the expander function to handle incoming midi
 (defn expander [event ts]
   (let [chan (:chan event)
         cmd (:cmd event)
@@ -48,19 +49,18 @@
       [_ 128] (let [notes (@notes-playing note)]
                 (doseq [n notes] (midi-note-off synth-out n))))))
 
-;; the expander function to handle incoming midi
-;; (midi-handle-events kb #'expander)
 
-;; ride cymbal
+;; drums
 (def ride (sample (freesound-path 436)))
-(ride)
 
 (def cymbal (sample (freesound-path 13254)))
 
 (def snap (sample (freesound-path 87731)))
 
+;; tempo
 (def metro (metronome 160))
 
+;; swing
 (defn offnote? [time]
   (= (mod time 1 ) 0.5))
 
@@ -82,8 +82,6 @@
     (play-bar m beat bar)
     (apply-at (m (+ len beat)) #'loop-play [m bar len])))
 
-;; re-evaluate to improvise some ride!
-
 (def length 4)
 
 (defn jazzdrums
@@ -94,7 +92,7 @@
                   (map (fn [t] [(- t 0.02) snap]) (range 1 length 2))
                   (map #(when (< (rand) 0.1) [% snare]) (range 0.5 length))
 
-                  (when (< (rand) 0.3)
+                  (when (< (rand) 0.1)
                     (let [t (+ 0.5 (rand-int length))]
                       (list [t kick] [t cymbal])))
                   )))
@@ -114,6 +112,8 @@
          (+ (beep note) (bass (midi->hz note)))))
     (apply-at (m (+ beat 1)) #'jazzbass [m note])))
 
+
+;; (midi-handle-events kb #'expander)
 
 ;; (loop-play metro #'jazzdrums length)
 

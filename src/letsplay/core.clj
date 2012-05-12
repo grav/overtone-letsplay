@@ -21,9 +21,9 @@
   (my-play time (flatten (repeatedly (fn [] (deref #'tones)))) 200))
 
 ;; (def tones [65 66 67])
-;; (loop-play (now) tones 200)0
+;; (loop-play (now) tones 200)
 ;; redefining tones will work, ie
-;; (def tones [67 66 65]
+;; (def tones [67 66 65])
 
 (defn updown [tones]
   (concat tones  (reverse (drop 1 (take (dec (count tones)) tones)))))

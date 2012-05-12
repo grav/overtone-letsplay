@@ -103,6 +103,8 @@
 ;; Set up rotater
 ;; (midi-handle-events kb #'rotater)
 
+;; TODO - set up midi output device from this file!
+
 ;; Play drums
 ;; (loop-play metro #'jazzdrums length)
 

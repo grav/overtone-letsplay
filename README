@@ -1,13 +1,18 @@
 # letsplay
 
-FIXME: write description
+Various Overtone experiments
 
 ## Usage
 
-FIXME: write
+The src/letsplay/jazz.clj is a jazz improviser, which will play jazzy drums and bass 
+and allow you to play along, augmenting any midi input in a jazzy way!
+
+Compile the script and go to the bottom to execute the various parts.
+
+You may have to set up input device (in jazz.clj) and output device (in rotater.clj) to be able to use the rotater
 
 ## License
 
-Copyright (C) 2012 FIXME
+Copyright (C) 2012 Mikkel Gravgaard
 
 Distributed under the Eclipse Public License, the same as Clojure.

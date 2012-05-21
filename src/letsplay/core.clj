@@ -31,8 +31,7 @@
 (def tones
   (degrees->pitches [:i :iii :v :vii] :ionian :F3))
 
-(freesound-path 52280)
- (defn tree-play [time tree sep]
+(defn tree-play [time tree sep]
   (let [node (first tree)]
     (when node
       (println node)
@@ -66,7 +65,7 @@
 
 (smart-rate (freebb 0) 1.5)
 
-(defn bbsynth [sample rate]
+ (defn bbsynth [sample rate]
   (synth
    (let
        [buf (play-buf 1 sample rate)]
@@ -107,9 +106,17 @@
         bar-remaining (mod beat 4)]
     (+ beat (- 4 bar-remaining))))
 
-(loopplay 0 (metro (nextbar)))
-(stop)
-
-(def r 3.95)
+(def launchpad (midi-in))
 
 (/ (Math/floor r) 1)
+
+(midi-handle-events launchpad #'break-it)
+
+(defn break-it [event ts]
+  (let [cmd (:cmd event)
+        note (:note event)]
+    ;; note on
+    (if (= cmd :note-on)
+      (loopplay note (metro (nextbar))))))
+
+(stop)

@@ -1,4 +1,4 @@
-(ns betafunk.letsplay
+(ns letsplay
   (:use overtone.live))
 
 (definst beep [note 60]
@@ -20,7 +20,7 @@
 (defn loop-play [time tones sep]
   (my-play time (flatten (repeatedly (fn [] (deref #'tones)))) 200))
 
-;; (def tones [65 66 67])
+;; (def tones [65 69 72])
 ;; (loop-play (now) tones 200)
 ;; redefining tones will work, ie
 ;; (def tones [67 66 65])
@@ -31,8 +31,8 @@
 (def tones
   (degrees->pitches [:i :iii :v :vii] :ionian :F3))
 
-
-(defn tree-play [time tree sep]
+(freesound-path 52280)
+ (defn tree-play [time tree sep]
   (let [node (first tree)]
     (when node
       (println node)
@@ -46,4 +46,72 @@
       (apply-at next-time
                 tree-play [next-time (rest tree) sep]))))
 
-;;(ctl myplay :sep 200)
+;;(ctl my-play :sep 200)
+(stop)
+
+;; outputs a buffer to use with play-buf
+(defn freebb [n]
+  (let [result (freesound-search "breakbeat")
+        id (:id (nth result n))]
+    (load-sample (freesound-path id))))
+
+(defn loga [a n]
+  (/ (Math/log n) (Math/log a)))
+
+(defn smart-rate [sample wanted-dur]
+  (let [dur (:duration sample)
+        pre-r  (/ dur  wanted-dur)
+        exp (Math/ceil (loga 2 pre-r))]
+    (/ pre-r (Math/pow 2 exp))))
+
+(smart-rate (freebb 0) 1.5)
+
+(defn bbsynth [sample rate]
+  (synth
+   (let
+       [buf (play-buf 1 sample rate)]
+     (out 0 [buf buf]))))
+
+(bbsynth (freebb 0) 1)
+
+(def wanted-dur 1.5)
+
+(defn playsolo [synth]
+  (dosync
+   (stop)
+   (synth)))
+
+
+(defn loopplay [n time]
+  (let [sample (freebb n)
+        rate (smart-rate sample wanted-dur)
+        synth (bbsynth sample rate)
+        dur (* 1000 (/ 1 rate) (:duration sample))]
+    (at time
+      (stop)
+      (synth))
+    (let [next (+ time dur)]
+      (apply-at next #'loopplay [n next] ))))
+
+
+(def tempo 160)
+
+(def bps (/ tempo 60))
+
+(def wanted-dur (* 4 (/ 1 bps)))
+
+(def metro (metronome tempo))
+
+(defn nextbeat []
+  (let [beat (metro)
+        bar-remaining (mod beat 4)
+        next-bar (+ beat (- 4 bar-remaining))]
+    (prn "metro" beat "next bar" next-bar)
+    (metro next-bar)))
+
+(loopplay 0 (nextbeat))
+(stop)
+
+(def r 3.95)
+
+(/ (Math/floor r) 1)

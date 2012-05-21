@@ -102,14 +102,12 @@
 
 (def metro (metronome tempo))
 
-(defn nextbeat []
+(defn nextbar []
   (let [beat (metro)
-        bar-remaining (mod beat 4)
-        next-bar (+ beat (- 4 bar-remaining))]
-    (prn "metro" beat "next bar" next-bar)
-    (metro next-bar)))
+        bar-remaining (mod beat 4)]
+    (+ beat (- 4 bar-remaining))))
 
-(loopplay 0 (nextbeat))
+(loopplay 0 (metro (nextbar)))
 (stop)
 
 (def r 3.95)

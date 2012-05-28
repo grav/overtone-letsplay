@@ -27,7 +27,7 @@
         trigger-vol 1
         start 0
         loop 1]
-    (inst (play-buf 1 sample rate trigger-vol start loop))))
+    (inst (play-buf channels sample rate trigger-vol start loop))))
 
 (def wanted-dur 1.5)
 

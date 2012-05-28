@@ -2,12 +2,13 @@
   (:use [overtone.live]
         [overtone.inst.drum]))
 
+;; this loads a sample into a buffer
 (defn fs-buffer [q n]
   (let [result (freesound-search :q q :f "duration:[0.0 TO 1.0]")
         id (:id (nth result n))]
     (load-sample (freesound-path id))))
 
-;; this makes a quick buffer with a freesound in it!
+;; this makes a quick play buffer with a freesound in it!
 (defn quickfree
   ([query n] (quickfree query n 1))
   ([query n rate]
@@ -24,12 +25,14 @@
 
 (def noises (list noise1 noise2 noise3 noise4))
 
+;; initial beep
 (definst beep [note 60 vol 1]
   (let
       [src (sin-osc (midicps note))
        env (env-gen (perc 0.01 0.3) :action FREE)]
     (* src env)))
 
+;; more interesting beep
 (definst beep [note 60 vol 1]
   (let
       [crossfade 0.7
@@ -47,8 +50,6 @@
 
 (def metro (metronome 160))
 
-(metro (metro))
-
 (defn my-play
   ([tones] (let [next-beat (metro)]
              (my-play next-beat tones)))
@@ -61,7 +62,7 @@
        (let [next-beat (+ (/ 1.0 divider) beat)]
          (apply-at (metro next-beat) my-play next-beat (rest tones) [])))))
 
-(def rhythm  (flatten (repeat 4 '(1 0 1 0 1 0 1 0))))
+(def rhythm (flatten (repeat 4 '(1 0 1 0 1 0 1 0))))
 
 (def tones (flatten (map #(map (fn [p] (+ p (* 12 %)))
                                (degrees->pitches '(:i :iii :iv :v :vii) :aeolian :D3 )) (range 2))))
@@ -85,15 +86,12 @@
                           tones)]
          (recur (conj result tone) rhythm-tail tones-tail (inc n) accfn)))))
 
-;;(my-play (melody rhythm tones (fn [n] (if (zero? (mod n 4)) 1 0.5))))
-
-(defn accfn [n]
+;; melody accents
+(defn mel-acc [n]
   (if (zero? (mod n 3)) 1.0 0.1))
 
-;;(my-play (flatten (repeatedly (fn [] (melody rhythm tones accfn)))))
-
-
-(defn acntfn [n]
+;; drum accents
+(defn drum-acc [n]
   (let [m (mod n 4)]
     (nth '(0.5 0.2 0.8 0.2) m)))
 
@@ -104,13 +102,14 @@
            next-beat (+ 0.5 beat)]
        (if (zero? (mod n 4))
          (at time
-           (kick)))
+           (kick)
+           ))
        (if (weighted-coin 0.8)
          (at time
-          ((rand-nth noises) (acntfn n))))
+          ((rand-nth noises) (drum-acc n))))
 
        (apply-at (metro next-beat) #'drumbeat next-beat (inc n) []))))
 
-(stop)
+;; (my-play (flatten (repeatedly (fn [] (melody rhythm tones mel-acc)))))
 
 ;; (drumbeat (metro))

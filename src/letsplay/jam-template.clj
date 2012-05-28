@@ -14,14 +14,16 @@
   ([query n rate]
      (play-buf 1 (fs-buffer query n) rate)))
 
-(definst noise1 [vol 1]  (* vol (quickfree "ding" 1 2)))
-(definst noise2 [vol 1]  (* vol (quickfree "ding" 2 1.5)))
-(definst noise3 [vol 1]  (* vol (quickfree "ding" 3)))
-(definst noise4 [vol 1]  (* vol (quickfree "ding" 7 1)))
+;; TODO - this should be more dynamic
+(definst noise1 [vol 1] (* vol (quickfree "ding" 3)))
+
+(definst noise2 [vol 1]  (* vol (quickfree "snap" 7 3)))
+
+(definst noise3 [vol 1] (* vol (quickfree "cluck" 1)))
+
+(definst noise4 [vol 1] (* vol (quickfree "pling" 6 3)))
 
 (def noises (list noise1 noise2 noise3 noise4))
-
-((rand-nth noises))
 
 ;; initial beep
 (definst beep [note 60]
@@ -34,6 +36,7 @@
 (def tones)
 
 (def metro (metronome 160))
+
 
 ;; (drumbeat (metro) 0)
 ;; (my-play (metro) (flatten (repeatedly (fn [] tones))))

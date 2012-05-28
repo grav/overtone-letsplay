@@ -1,4 +1,4 @@
-(ns letsplay
+(ns letsplay.jam
   (:use [overtone.live]
         [overtone.inst.drum]))
 

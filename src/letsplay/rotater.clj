@@ -35,15 +35,18 @@
 
 ;; the rotater function to handle incoming midi
 (defn rotater [event ts]
+
   (let [chan (:chan event)
         cmd (:cmd event)
         note (:note event)]
     (match [chan cmd]
       ;; note-on
-      [_ 144] (dosync ;; (next-rotate) and (add-notes) must be sync'ed
+      [_ :note-on] (dosync ;; (next-rotate) and (add-notes) must be sync'ed
                (let [notes (map #(+ % note) [(next-rotate) 0 7])]
+                 (prn "out")
                  (add-notes note notes) ;; mapping note => notes
                  (doseq [n notes] (midi-note-on synth-out n (:vel event)))))
       ;; note-off
-      [_ 128] (let [notes (@notes-playing note)]
+      [_ :note-off] (let [notes (@notes-playing note)]
+
                 (doseq [n notes] (midi-note-off synth-out n))))))

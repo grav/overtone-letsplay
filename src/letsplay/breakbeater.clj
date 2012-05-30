@@ -1,4 +1,4 @@
-(ns letsplay
+(ns letsplay.breakbeater
   (:use overtone.live))
 
 (def loop-playing (ref {}))
@@ -37,10 +37,12 @@
         synth (bbsynth sample rate)
         dur (* 1000 (/ 1 rate) (:duration sample))]
     (at time
-      (kill @loop-playing)
+      (if (not (= {} @loop-playing))
+        (kill @loop-playing))
+      (synth)
+
       (dosync
-       (ref-set loop-playing synth)
-       (loop-playing)))))
+       (ref-set loop-playing synth)))))
 
 
 (def tempo 160)
@@ -64,4 +66,4 @@
     (if (= cmd :note-on)
       (startloop note (metro (nextbar))))))
 
-(midi-handle-events launchpad #'break-it)
+;; (midi-handle-events launchpad #'break-it)

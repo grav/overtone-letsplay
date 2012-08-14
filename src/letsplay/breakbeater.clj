@@ -32,6 +32,7 @@
 (def wanted-dur 1.5)
 
 (defn startloop [n time]
+  (prn "startloop" n time)
   (let [sample (freebb n)
         rate (smart-rate sample wanted-dur)
         synth (bbsynth sample rate)
@@ -61,9 +62,10 @@
 (def launchpad (midi-in "Launchpad"))
 
 (defn break-it [event ts]
-  (let [cmd (:cmd event)
-        note (:note event)]
-    (if (= cmd :note-on)
-      (startloop note (metro (nextbar))))))
+  (let [note (:note event)]
+    (startloop note (metro (nextbar)))))
 
-;; (midi-handle-events launchpad #'break-it)
+(on-event [:midi :note-on]
+          (fn [e]
+            (break-it e 0))
+          ::my-handler)

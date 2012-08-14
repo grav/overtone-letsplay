@@ -44,10 +44,10 @@
                (let [notes (map #(+ % note) [(next-rotate) 0 7])]
                  (prn 'on notes)
                  (add-notes note notes) ;; mapping note => notes
-;                 (doseq [n notes] (midi-note-on synth-out n (:velocity event)))
+                 (doseq [n notes] (midi-note-on synth-out n (:velocity event)))
                  ))
       ;; note-off
       [_ :note-off] (let [notes (@notes-playing note)]
                       (prn 'off notes)
- ;;                     (doseq [n notes] (midi-note-off synth-out n))
+                      (doseq [n notes] (midi-note-off synth-out n))
                       ))))

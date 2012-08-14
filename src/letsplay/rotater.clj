@@ -13,7 +13,7 @@
 
 
 ;; Specify output device
-(def synth-out (midi-out "FastTrack Pro"))
+(def synth-out (midi-out "Bus 1"))
 
 ;; Rotate between these notes
 (def rotate (ref '(-10 -7 -14 -5)) )
@@ -35,18 +35,20 @@
 
 ;; the rotater function to handle incoming midi
 (defn rotater [event ts]
-
   (let [chan (:chan event)
-        cmd (:cmd event)
+        cmd (:command event)
         note (:note event)]
     (match [chan cmd]
       ;; note-on
       [_ :note-on] (dosync ;; (next-rotate) and (add-notes) must be sync'ed
                (let [notes (map #(+ % note) [(next-rotate) 0 7])]
-                 (prn "out")
+                 (prn "on")
                  (add-notes note notes) ;; mapping note => notes
-                 (doseq [n notes] (midi-note-on synth-out n (:vel event)))))
+;                 (doseq [n notes] (midi-note-on synth-out n (:velocity event)))
+                 ))
       ;; note-off
       [_ :note-off] (let [notes (@notes-playing note)]
-
-                (doseq [n notes] (midi-note-off synth-out n))))))
+                      (prn 'off')
+                      (prn notes)
+ ;;                     (doseq [n notes] (midi-note-off synth-out n))
+                      ))))

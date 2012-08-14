@@ -1,3 +1,4 @@
+
 (ns letsplay.jazz
   (:use [overtone.live]
         [overtone.inst.drum]
@@ -95,13 +96,23 @@
 ;; Specify input device
 ;; No arg will list midi devices in pop-up and
 ;; allow you to select one
-(def kb (midi-in "FastTrack Pro"))
+(def kb (midi-in "Port 1"))
 
 ;; Place cursor at the end of these expressions
 ;; and do C-x e to execute them
 
 ;; Set up rotater
 ;; (midi-handle-events kb #'rotater)
+
+(on-event [:midi :note-on]
+          (fn [e]
+            (rotater e 0))
+          ::handle-rotate-on)
+
+(on-event [:midi :note-off]
+          (fn [e]
+            (rotater e 0))
+          ::handle-rotate-off)
 
 ;; TODO - set up midi output device from this file!
 

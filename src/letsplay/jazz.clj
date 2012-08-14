@@ -104,12 +104,12 @@
 ;; Set up rotater
 ;; (midi-handle-events kb #'rotater)
 
-(on-event [:midi :note-on]
+(on-event [:midi-device "Novation" "Port 1" "SL MkII Port 1" :note-on]
           (fn [e]
             (rotater e 0))
           ::handle-rotate-on)
 
-(on-event [:midi :note-off]
+(on-event [:midi-device "Novation" "Port 1" "SL MkII Port 1" :note-off]
           (fn [e]
             (rotater e 0))
           ::handle-rotate-off)

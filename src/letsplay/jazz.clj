@@ -81,11 +81,13 @@
                ;; TODO - avoid hanging around at the limits
                (limit (+ n (rand-nth '(-7 -6 -5 5 6 7))) 40 65))]
     (at tick
-      (+ (beep note) (bass (midi->hz note))))
+      (beep note)
+      (bass (midi->hz note)))
     ;; extra off-beat note with same tone
     (when (> 0.1 (rand))
       (at (m (+ beat (groove 0.5)) )
-         (+ (beep note) (bass (midi->hz note)))))
+        (beep note)
+        (bass (midi->hz note))))
     (apply-at (m (+ beat 1)) #'jazzbass [m note])))
 
 

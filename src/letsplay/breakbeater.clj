@@ -56,16 +56,12 @@
 
 (defn nextbar []
   (let [beat (metro)
-        bar-remaining (mod beat 4)]
-    (+ beat (- 4 bar-remaining))))
+        bar-beat (mod beat 4)]
+    (+ beat (- 4 bar-beat))))
 
 (def launchpad (midi-in "Launchpad"))
 
-(defn break-it [event ts]
-  (let [note (:note event)]
-    (startloop note (metro (nextbar)))))
-
 (on-event [:midi :note-on]
           (fn [e]
-            (break-it e 0))
+            (startloop (:note e) (metro (nextbar))))
           ::my-handler)

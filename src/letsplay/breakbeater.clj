@@ -12,9 +12,12 @@
 (defn loga [a n]
   (/ (Math/log n) (Math/log a)))
 
-(defn smart-rate [sample wanted-dur]
-  (let [dur (:duration sample)
-        pre-r  (/ dur  wanted-dur)
+;; definition by example
+
+;; wanted-dur is the duration that we want a multiple of
+(defn smart-rate [dur wanted-dur]
+  (let [pre-r  (/ dur  wanted-dur) ;;
+        ;; how many times can our wanted duration fit in the duration
         exp (Math/ceil (loga 2 pre-r))]
     (let [rate (/ pre-r (Math/pow 2 exp))]
       (if (< rate 0.8)
@@ -34,7 +37,7 @@
 (defn startloop [n time]
   (prn 'startloop n time)
   (let [sample (freebb n)
-        rate (smart-rate sample wanted-dur)
+        rate (smart-rate (:duration sample) wanted-dur)
         synth (bbsynth sample rate)
         dur (* 1000 (/ 1 rate) (:duration sample))]
     (at time

@@ -32,7 +32,7 @@
 (def wanted-dur 1.5)
 
 (defn startloop [n time]
-  (prn "startloop" n time)
+  (prn 'startloop n time)
   (let [sample (freebb n)
         rate (smart-rate sample wanted-dur)
         synth (bbsynth sample rate)

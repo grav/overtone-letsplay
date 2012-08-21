@@ -20,14 +20,10 @@
 (def snap (sample (freesound-path 87731)))
 
 ;; todo - offnote
-(defn offnote? [time]
-  (= (mod time 1) 0.5))
+
 
 ;; todo - swing
-(defn swing [time]
-  (if (offnote? time)
-    (+ time 0.2)
-    time))
+
 
 (def tempo 160)
 
@@ -58,23 +54,23 @@
   (filter #(not (nil? %))
           (concat
            ;; ride on every beat
-           (map (fn [t] [t ride]) (range 0 4))
+
 
            ;; off-beat ride
-           (map #(when (weighted-coin 0.3) [% ride]) (range 0.5 4))
+
 
            ;; snaps on every other beat
-           (map (fn [t] [(+ 0.02 t) snap]) (range 1 4 2))
+
 
            ;; the snaps are a bit late, subtract a bit to get them on time
 
 
            ;; off-beat snare once in a while
-           (map #(when (weighted-coin 0.1) [% snare]) (range 0.5 4))
+
 
            ;; 'hit' consisting of cymbal+kick at some random off-beat
            ;; doing it this way allows us to place two drums on same beat
-;;           (when (weighted-coin 0.3) (let [b (rand-nth (range 0.5 4))] (list [b kick] [b cymbal])))
+
            )))
 
 (defn limit [n minimum maximum]

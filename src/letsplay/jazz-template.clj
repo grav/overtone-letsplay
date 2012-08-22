@@ -77,23 +77,12 @@
   (max minimum
        (min maximum n)))
 
-(defn jazzbass [n]
-  (let [beat (metro)
-        tick (metro beat)
-        note (if (not (zero? (mod beat 2)))
-               (dec n)
-               ;; keep tone inside interval
-               ;; TODO - avoid hanging around at the limits
-               (limit (+ n (rand-nth '(-7 -6 -5 5 6 7))) 40 65))]
-    (at tick
-      (beep note)
-      (bass (midi->hz note)))
-    ;; extra off-beat note with same tone
-    (when (> 0.1 (rand))
-      (at (metro (+ beat (swing 0.5)) )
-        (beep note)
-        (bass (midi->hz note))))
-    (apply-at (metro (+ beat 1)) #'jazzbass [note])))
+(def jazz-intervals '(-7 -6 -5 5 6 7))
+(def maxbass 40)
+(def minbass 65)
+
+;; todo - jazzbass taking start note
+
 
 (stop)
 ;; tempo
@@ -114,7 +103,7 @@
 ;; TODO - set up midi output device from this file!
 
 ;; Play drums
-;; (loop-play metro #'jazzdrums length)
+;; (loop-play #'jazzdrums length)
 
 ;; Play bass
 ;; (jazzbass 45)

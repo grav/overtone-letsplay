@@ -29,18 +29,18 @@
     (+ time 0.2)
     time))
 
-(defn play-bar [m bar-beat bar]
+(defn play-bar [bar-beat bar]
   (doseq [hit ((deref bar))]
     (let [hit-time (groove (first hit))
           instr (second hit)]
-      (at (m (+ bar-beat hit-time))
+      (at (metro (+ bar-beat hit-time))
         (instr)))))
 
 
-(defn loop-play [m bar len]
-  (let [beat (m)]
-    (play-bar m beat bar)
-    (apply-at (m (+ len beat)) #'loop-play [m bar len])))
+(defn loop-play [bar len]
+  (let [beat (metro)]
+    (play-bar beat bar)
+    (apply-at (metro (+ len beat)) #'loop-play [bar len])))
 
 (def length 4)
 
@@ -76,9 +76,10 @@
 (def maxbass 40)
 (def minbass 65)
 
-(defn jazzbass [m n]
-  (let [beat (m)
-        tick (m beat)
+;; todo - jazzbass
+(defn jazzbass [n]
+  (let [beat (metro)
+        tick (metro beat)
         note (if (not (zero? (mod beat 2)))
                ;; just go half a step down
                (dec n)
@@ -90,10 +91,10 @@
       (bass (midi->hz note)))
     ;; extra off-beat note with same tone
     (when (> 0.1 (rand))
-      (at (m (+ beat (groove 0.5)) )
+      (at (metro (+ beat (groove 0.5)) )
         (beep note)
         (bass (midi->hz note))))
-    (apply-at (m (+ beat 1)) #'jazzbass [m note])))
+    (apply-at (metro (+ beat 1)) #'jazzbass [note])))
 
 
 ;; tempo
@@ -124,10 +125,10 @@
 ;; TODO - set up midi output device from this file!
 
 ;; Play drums
-;; (loop-play metro #'jazzdrums length)
+;; (loop-play #'jazzdrums length)
 
 ;; Play bass
-;; (jazzbass metro 45)
+;; (jazzbass 45)
 
 ;; (stop)
 

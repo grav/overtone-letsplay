@@ -4,7 +4,7 @@
         [overtone.inst.synth]
         [letsplay.rotater]))
 
-(remove-all-handlers)
+(remove-handler :breakbeat-handler)
 
 ;; just a simple example of a synth
 ;; we'll use this together with the bass
@@ -45,9 +45,6 @@
 
 (def length 4)
 
-(stop)
-
-
 ;; todo - drum pattern
 ;; list of pairs (beat, instrument)
 (defn jazzdrums
@@ -86,21 +83,27 @@
 ;; todo - jazzbass taking start note
 
 
-(stop)
-;; tempo
-(def tempo 160)
-(def metro (metronome tempo))
-
 ;; Specify input device
 ;; No arg will list midi devices in pop-up and
 ;; allow you to select one
-(def kb (midi-in "FastTrack Pro"))
+
 
 ;; Place cursor at the end of these expressions
 ;; and do C-x e to execute them
 
 ;; Set up rotater
-;; (midi-handle-events kb #'rotater)
+
+(def device-filter [ :midi-device "Novation DMS Ltd" "Launchpad" "Launchpad"])
+
+(on-event (conj device-filter :note-on)
+          (fn [e]
+            (rotater e 0))
+          :handle-rotate-on)
+
+(on-event (conj device-filter :note-off)
+          (fn [e]
+            (rotater e 0))
+          :handle-rotate-off)
 
 ;; TODO - set up midi output device from this file!
 

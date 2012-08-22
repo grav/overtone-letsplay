@@ -87,20 +87,16 @@
   (let [m (mod n 4)]
     (nth '(0.5 0.2 0.8 0.2) m)))
 
+;; todo - drumbeat
 (defn drumbeat
   ([beat] (drumbeat beat 0))
   ([beat n]
-     (let [time (metro beat)
-           next-beat (+ 0.5 beat)]
-       (if (zero? (mod n 8))
-         (at time
-           (kick)
-           ))
-       (if (weighted-coin 0.5)
-         (at time
-          ((rand-nth noises) (drum-acc n))))
+     ;; ...
+))
 
-       (apply-at (metro next-beat) #'drumbeat next-beat (+ 2 n) []))))
+(def rhythm '(1))
+
+(def tones '(65 66 67))
 
 ;; (my-play (flatten (repeatedly (fn [] (melody rhythm tones)))))
 

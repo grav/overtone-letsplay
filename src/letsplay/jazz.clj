@@ -24,14 +24,14 @@
 (defn offnote? [time]
   (= (mod time 1 ) 0.5))
 
-(defn groove [time]
+(defn swing [time]
   (if (offnote? time)
     (+ time 0.2)
     time))
 
 (defn play-bar [bar-beat bar]
   (doseq [hit ((deref bar))]
-    (let [hit-time (groove (first hit))
+    (let [hit-time (swing (first hit))
           instr (second hit)]
       (at (metro (+ bar-beat hit-time))
         (instr)))))
@@ -91,7 +91,7 @@
       (bass (midi->hz note)))
     ;; extra off-beat note with same tone
     (when (> 0.1 (rand))
-      (at (metro (+ beat (groove 0.5)) )
+      (at (metro (+ beat (swing 0.5)) )
         (beep note)
         (bass (midi->hz note))))
     (apply-at (metro (+ beat 1)) #'jazzbass [note])))

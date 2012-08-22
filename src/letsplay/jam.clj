@@ -14,7 +14,7 @@
   ([query n rate]
      (play-buf 1 (fs-buffer query n) rate)))
 
-;; TODO - this should be more dynamic
+;; random noises from freesound
 (definst noise1 [vol 1] (* vol (quickfree "ding" 3)))
 
 (definst noise2 [vol 1]  (* vol (quickfree "snap" 7 3)))
@@ -22,6 +22,8 @@
 (definst noise3 [vol 1] (* vol (quickfree "cluck" 1)))
 
 (definst noise4 [vol 1] (* vol (quickfree "pling" 6 3)))
+
+;; todo - more noices
 
 (def noises (list noise1 noise2 noise3 noise4))
 
@@ -77,7 +79,7 @@
        (let [rhythm-tail (rest rhythm)
              vol (first rhythm)
              tone (if (zero? vol)
-                    {:note (- (first tones) 7)
+                    {:note (- (first tones) 12)
                      :vol 0.6}
                     {:note (first tones)
                      :vol (* vol (accfn n))})
@@ -109,6 +111,10 @@
           ((rand-nth noises) (drum-acc n))))
 
        (apply-at (metro next-beat) #'drumbeat next-beat (inc n) []))))
+
+(def tones '(65 64 60))
+
+(def rhythm '(1 1 1))
 
 ;; (my-play (flatten (repeatedly (fn [] (melody rhythm tones mel-acc)))))
 

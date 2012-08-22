@@ -14,7 +14,7 @@
   ([query n rate]
      (play-buf 1 (fs-buffer query n) rate)))
 
-;; some random noises from freesound
+;; random noises from freesound
 (definst noise1 [vol 1] (* vol (quickfree "ding" 3)))
 
 (definst noise2 [vol 1]  (* vol (quickfree "snap" 7 3)))
@@ -23,7 +23,7 @@
 
 (definst noise4 [vol 1] (* vol (quickfree "pling" 6 3)))
 
-;; todo - more noises!
+;; todo - more noices
 
 (def noises (list noise1 noise2 noise3 noise4))
 
@@ -35,7 +35,10 @@
     (* src env)))
 
 ;; todo - more interesting beep
-;; ex: detune, cross-fade, several oscs, ...
+;; crossfade, more oscs, detune
+(definst beep [note 60 vol 1]
+
+  )
 
 (def metro (metronome 160))
 
@@ -43,21 +46,19 @@
   ([tones] (let [next-beat (metro)]
              (my-play next-beat tones)))
   ([beat tones]
-     (my-play beat tones 0))
-  ([beat tones n]
      (let [tone (first tones)
            time (metro beat)
            divider 2]
        (at time
-         (beep (:note tone) (:vol tone) (/ (mod n 7) 7)))
+         (beep (:note tone) (:vol tone)))
        (let [next-beat (+ (/ 1.0 divider) beat)]
-         (apply-at (metro next-beat) my-play next-beat (rest tones) n [])))))
+         (apply-at (metro next-beat) my-play next-beat (rest tones) [])))))
 
-;; todo - rhythm, list of volumes
+(def rhythm (flatten (repeat 4 '(1 0 1 0 1 0 1 0))))
 
-;; todo - tones, list of pitches
+(def tones (flatten (map #(map (fn [p] (+ p (* 12 %)))
+                               (degrees->pitches '(:i :iii :iv :v :vii) :aeolian :D3 )) (range 2))))
 
-;; combine rhythm and tones
 (defn melody
   ([rhythm tones] (melody [] rhythm tones 0 (fn [n] 1)))
   ([rhythm tones accfn] (melody [] rhythm tones 0 accfn))
@@ -68,7 +69,6 @@
        (let [rhythm-tail (rest rhythm)
              vol (first rhythm)
              tone (if (zero? vol)
-                    ;; subtract octave when 'ghost'
                     {:note (- (first tones) 12)
                      :vol 0.6}
                     {:note (first tones)
@@ -91,15 +91,13 @@
 (defn drumbeat
   ([beat] (drumbeat beat 0))
   ([beat n]
-     ;; ...
-))
+;; ...
+     ))
 
-(def rhythm '(1))
+(def tones '(65 64 60))
 
-(def tones '(65 66 67))
+(def rhythm '(1 1 1))
 
-;; (my-play (flatten (repeatedly (fn [] (melody rhythm tones)))))
+;; (my-play (flatten (repeatedly (fn [] (melody rhythm tones mel-acc)))))
 
 ;; (drumbeat (metro))
-
-;; (stop)

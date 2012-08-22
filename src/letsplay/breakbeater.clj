@@ -1,8 +1,6 @@
 (ns letsplay.breakbeater
   (:use overtone.live))
 
-(remove-all-handlers)
-
 (def loop-playing (ref {}))
 
 ;; outputs a buffer to use with play-buf
@@ -69,4 +67,4 @@
 (on-event [:midi :note-on]
           (fn [e]
             (startloop (:note e) (metro (nextbar))))
-          ::breakbeat-handler)
+          :breakbeat-handler)

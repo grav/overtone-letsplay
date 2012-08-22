@@ -5,6 +5,8 @@
         [overtone.inst.synth]
         [letsplay.rotater]))
 
+(remove-all-handlers)
+
 ;; just a simple example of a synth
 ;; we'll use this together with the bass
 (definst beep [note 60]

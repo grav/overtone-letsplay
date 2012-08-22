@@ -1,11 +1,10 @@
-
 (ns letsplay.jazz
   (:use [overtone.live]
         [overtone.inst.drum]
         [overtone.inst.synth]
         [letsplay.rotater]))
 
-(remove-all-handlers)
+(remove-handler :breakbeat-handler)
 
 ;; just a simple example of a synth
 ;; we'll use this together with the bass
@@ -31,8 +30,12 @@
     (+ time 0.2)
     time))
 
+(def tempo 160)
+
+(def metro (metronome tempo))
+
 (defn play-bar [bar-beat bar]
-  (doseq [hit ((deref bar))]
+  (doseq [hit (bar)]
     (let [hit-time (swing (first hit))
           instr (second hit)]
       (at (metro (+ bar-beat hit-time))
@@ -99,30 +102,23 @@
     (apply-at (metro (+ beat 1)) #'jazzbass [note])))
 
 
-;; tempo
-(def tempo 160)
-(def metro (metronome tempo))
-
-;; Specify input device
-;; No arg will list midi devices in pop-up and
-;; allow you to select one
-(def kb (midi-in "Port 1"))
-
 ;; Place cursor at the end of these expressions
 ;; and do C-x e to execute them
 
 ;; Set up rotater
-;; (midi-handle-events kb #'rotater)
 
-(on-event [:midi-device "Novation" "Port 1" "SL MkII Port 1" :note-on]
+(def device-filter [ :midi-device "Novation DMS Ltd" "Launchpad" "Launchpad"])
+
+
+(on-event (conj device-filter :note-on)
           (fn [e]
             (rotater e 0))
-          ::handle-rotate-on)
+          :handle-rotate-on)
 
-(on-event [:midi-device "Novation" "Port 1" "SL MkII Port 1" :note-off]
+(on-event (conj device-filter :note-off)
           (fn [e]
             (rotater e 0))
-          ::handle-rotate-off)
+          :handle-rotate-off)
 
 ;; TODO - set up midi output device from this file!
 

@@ -72,14 +72,19 @@
   (max minimum
        (min maximum n)))
 
+(def jazz-intervals '(-7 -6 -5 5 6 7))
+(def maxbass 40)
+(def minbass 65)
+
 (defn jazzbass [m n]
   (let [beat (m)
         tick (m beat)
         note (if (not (zero? (mod beat 2)))
+               ;; just go half a step down
                (dec n)
                ;; keep tone inside interval
                ;; TODO - avoid hanging around at the limits
-               (limit (+ n (rand-nth '(-7 -6 -5 5 6 7))) 40 65))]
+               (limit (+ n (rand-nth jazz-intervals)) maxbass minbass))]
     (at tick
       (beep note)
       (bass (midi->hz note)))

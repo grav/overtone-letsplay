@@ -41,7 +41,6 @@
       (at (metro (+ bar-beat hit-time))
         (instr)))))
 
-
 (defn loop-play [bar len]
   (let [beat (metro)]
     (play-bar beat bar)
@@ -81,29 +80,33 @@
 (def maxbass 40)
 (def minbass 65)
 
-;; todo - jazzbass
-(defn jazzbass [n]
-  (let [beat (metro)
-        tick (metro beat)
-        note (if (not (zero? (mod beat 2)))
-               ;; just go half a step down
-               (dec n)
-               ;; keep tone inside interval
-               ;; TODO - avoid hanging around at the limits
-               (limit (+ n (rand-nth jazz-intervals)) maxbass minbass))]
-    (at tick
-      (beep note)
-      (bass (midi->hz note)))
-    ;; extra off-beat note with same tone
-    (when (> 0.1 (rand))
-      (at (metro (+ beat (swing 0.5)) )
-        (beep note)
-        (bass (midi->hz note))))
-    (apply-at (metro (+ beat 1)) #'jazzbass [note])))
 
+(defn jazzbass
+  ([] (let [start-note 45
+            beat (metro)
+            next-even (if (zero? (mod beat 2))
+                        beat
+                        (inc beat))]
+        (apply-at (metro next-even) #'jazzbass [start-note])))
+  ([n]
+     (let [beat (metro)
+           tick (metro beat)
+           note (if (not (zero? (mod beat 2)))
+                  ;; just go half a step down
+                  (dec n)
+                  ;; keep tone inside interval
+                  ;; TODO - avoid hanging around at the limits
+                  (limit (+ n (rand-nth jazz-intervals)) maxbass minbass))]
+       (at tick
+         (beep note)
+         (bass (midi->hz note)))
+       ;; extra off-beat note with same tone
+       (when (> 0.1 (rand))
+         (at (metro (+ beat (swing 0.5)) )
+           (beep note)
+           (bass (midi->hz note))))
+       (apply-at (metro (+ beat 1)) #'jazzbass [note]))))
 
-;; Place cursor at the end of these expressions
-;; and do C-x e to execute them
 
 ;; Set up rotater
 
@@ -120,13 +123,33 @@
             (rotater e 0))
           :handle-rotate-off)
 
-;; TODO - set up midi output device from this file!
+(defn rotater-hit [note vel len]
+  (let [start (+ 1 (metro))]
+   (do
+     (at (metro start)
+       (rotater-on note vel))
+     (apply-at
+      (metro (+ len start))
+      #'rotater-off [note]))))
+
+(defn stab []
+  (let [note (rand-nth (range 56 67))
+        vel (rand-nth (range 10 80 5))
+        len (rand-nth (range 0.05 0.3 0.05))
+        interval (rand-nth [4])]
+    (map #(rotater-hit % vel len) (list note (+ note interval)))))
+
+;; Place cursor at the end of these expressions
+;; and do C-x e to execute them
 
 ;; Play drums
 ;; (loop-play #'jazzdrums length)
 
 ;; Play bass
-;; (jazzbass 45)
+;; (jazzbass)
+
+;; Play some pno!
+;; (stab)
 
 ;; (stop)
 

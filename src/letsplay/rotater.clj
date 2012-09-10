@@ -8,9 +8,6 @@
 (ns letsplay.rotater
   (:use [overtone.live]))
 
-;; a bit of pattern matching
-(use '[clojure.core.match :only [match]])
-
 
 ;; Specify output device
 (def synth-out (midi-out "Bus 1"))
@@ -53,9 +50,6 @@
         cmd (:command event)
         note (:note event)
         vel (:velocity event)]
-    (match [chan cmd]
-      ;; note-on
-      [_ :note-on] (rotater-on note vel)
-
-      ;; note-off
-      [_ :note-off] (rotater-off note))))
+    (case cmd
+      :note_-on (rotater-on note vel)
+      :note-off (rotater-off note))))

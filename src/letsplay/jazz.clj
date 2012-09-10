@@ -149,6 +149,9 @@
 ;; (jazzbass)
 
 ;; Play some pno!
+;; currently, this sends out midi, so you'll have to
+;; connect something at the other end ;-)
+;; Check the synth-out def in rotater.clj
 ;; (stab)
 
 ;; (stop)

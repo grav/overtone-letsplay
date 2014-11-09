@@ -2,9 +2,9 @@
   (:use [overtone.live]
         [overtone.inst.drum]
         [overtone.inst.synth]
-        [letsplay.rotater]))
+#_        [letsplay.rotater]))
 
-(remove-handler :breakbeat-handler)
+;(remove-handler :breakbeat-handler)
 
 ;; just a simple example of a synth
 ;; we'll use this together with the bass
@@ -113,31 +113,31 @@
 (def device-filter [ :midi-device "Novation DMS Ltd" "Launchpad" "Launchpad"])
 
 
-(on-event (conj device-filter :note-on)
-          (fn [e]
-            (rotater e 0))
-          :handle-rotate-on)
+(comment (on-event (conj device-filter :note-on)
+                   (fn [e]
+                     (rotater e 0))
+                   :handle-rotate-on)
 
-(on-event (conj device-filter :note-off)
-          (fn [e]
-            (rotater e 0))
-          :handle-rotate-off)
+         (on-event (conj device-filter :note-off)
+                   (fn [e]
+                     (rotater e 0))
+                   :handle-rotate-off)
 
-(defn rotater-hit [note vel len]
-  (let [start (+ 1 (metro))]
-   (do
-     (at (metro start)
-       (rotater-on note vel))
-     (apply-at
-      (metro (+ len start))
-      #'rotater-off [note]))))
+         (defn rotater-hit [note vel len]
+           (let [start (+ 1 (metro))]
+             (do
+               (at (metro start)
+                   (rotater-on note vel))
+               (apply-at
+                (metro (+ len start))
+                #'rotater-off [note]))))
 
-(defn stab []
-  (let [note (rand-nth (range 56 67))
-        vel (rand-nth (range 10 80 5))
-        len (rand-nth (range 0.05 0.3 0.05))
-        interval (rand-nth [4])]
-    (map #(rotater-hit % vel len) (list note (+ note interval)))))
+         (defn stab []
+           (let [note (rand-nth (range 56 67))
+                 vel (rand-nth (range 10 80 5))
+                 len (rand-nth (range 0.05 0.3 0.05))
+                 interval (rand-nth [4])]
+             (map #(rotater-hit % vel len) (list note (+ note interval))))))
 
 ;; Place cursor at the end of these expressions
 ;; and do C-x e to execute them

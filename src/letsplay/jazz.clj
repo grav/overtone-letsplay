@@ -44,7 +44,8 @@
 (defn loop-play [bar len]
   (let [beat (metro)]
     (play-bar beat bar)
-    (apply-at (metro (+ len beat)) #'loop-play [bar len])))
+    (apply-at (metro (+ (dec len) beat)) #'loop-play [bar len])))
+
 
 (def length 4)
 
@@ -105,7 +106,8 @@
          (at (metro (+ beat (swing 0.5)) )
            (beep note)
            (bass (midi->hz note))))
-       (apply-at (metro (+ beat 1)) #'jazzbass [note]))))
+       (apply-at (metro beat) #'jazzbass [note]))))
+
 
 
 ;; Set up rotater

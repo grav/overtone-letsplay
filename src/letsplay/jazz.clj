@@ -1,10 +1,9 @@
 (ns letsplay.jazz
-  (:use [overtone.live]
+  (:use
         [overtone.inst.drum]
         [overtone.inst.synth]
-#_        [letsplay.rotater]))
-
-;(remove-handler :breakbeat-handler)
+        [letsplay.rotater])
+  (:require [overtone.live :as overtone :refer :all :exclude [rotate]]))
 
 ;; just a simple example of a synth
 ;; we'll use this together with the bass
@@ -99,13 +98,13 @@
                   ;; TODO - avoid hanging around at the limits
                   (limit (+ n (rand-nth jazz-intervals)) maxbass minbass))]
        (at tick
-         (beep note)
-         (bass (midi->hz note)))
+           (beep note)
+           (bass (midi->hz note)))
        ;; extra off-beat note with same tone
        (when (> 0.1 (rand))
          (at (metro (+ beat (swing 0.5)) )
-           (beep note)
-           (bass (midi->hz note))))
+             (beep note)
+             (bass (midi->hz note))))
        (apply-at (metro beat) #'jazzbass [note]))))
 
 
@@ -116,30 +115,28 @@
 
 
 (comment (on-event (conj device-filter :note-on)
-                   (fn [e]
-                     (rotater e 0))
-                   :handle-rotate-on)
+           (fn [e]
+             (rotater e 0))
+           :handle-rotate-on)
 
          (on-event (conj device-filter :note-off)
                    (fn [e]
                      (rotater e 0))
-                   :handle-rotate-off)
+                   :handle-rotate-off))
 
-         (defn rotater-hit [note vel len]
-           (let [start (+ 1 (metro))]
-             (do
-               (at (metro start)
-                   (rotater-on note vel))
-               (apply-at
-                (metro (+ len start))
-                #'rotater-off [note]))))
+(defn rotater-hit [note vel len]
+  (let [start (+ 1 (metro))]
+    (rotater-on note vel)
+    (apply-at
+     (metro (dec (+ len start)))
+     #'rotater-off [note])))
 
-         (defn stab []
-           (let [note (rand-nth (range 56 67))
-                 vel (rand-nth (range 10 80 5))
-                 len (rand-nth (range 0.05 0.3 0.05))
-                 interval (rand-nth [4])]
-             (map #(rotater-hit % vel len) (list note (+ note interval))))))
+(defn stab []
+  (let [note (rand-nth (range 56 67))
+        vel (rand-nth (range 10 80 5))
+        len (rand-nth (range 0.1 0.3 0.05))
+        interval (rand-nth [4])]
+    (map #(rotater-hit % vel len) (list note (+ note interval)))))
 
 ;; Place cursor at the end of these expressions
 ;; and do C-x e to execute them

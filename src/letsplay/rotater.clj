@@ -6,11 +6,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (ns letsplay.rotater
-  (:use [overtone.live]))
+  (:require [overtone.live :as overtone :refer :all :exclude [rotate]]))
 
 
 ;; Specify output device
-(def synth-out (midi-out "Bus 1"))
+
+(defonce synth-out
+  ;; seems to be necessary in 0.9.0
+  (nth (midi-connected-receivers) 3))
+
 
 ;; Rotate between these notes
 (def rotate (ref '(-10 -7 -14 -5)) )

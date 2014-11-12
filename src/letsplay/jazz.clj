@@ -133,7 +133,7 @@
 
 (defn stab []
   (let [note (rand-nth (range 56 67))
-        vel (rand-nth (range 10 80 5))
+        vel (rand-nth (range 40 80 5))
         len (rand-nth (range 0.1 0.3 0.05))
         interval (rand-nth [4])]
     (map #(rotater-hit % vel len) (list note (+ note interval)))))

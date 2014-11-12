@@ -13,7 +13,7 @@
 
 (defonce synth-out
   ;; seems to be necessary in 0.9.0
-  (nth (midi-connected-receivers) 3))
+  (midi-find-connected-receiver "IAC"))
 
 
 ;; Rotate between these notes

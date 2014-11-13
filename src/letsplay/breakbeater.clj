@@ -62,7 +62,7 @@
         bar-beat (mod beat 4)]
     (+ beat (- 4 bar-beat))))
 
-(def launchpad (midi-in "Launchpad"))
+(def launchpad (midi-find-connected-receiver "Launchpad"))
 
 (on-event [:midi :note-on]
           (fn [e]
